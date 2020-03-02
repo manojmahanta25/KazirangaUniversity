@@ -16,7 +16,13 @@ use Illuminate\Http\Request;
 //Route::middleware('auth:api')->get('/user', function (Request $request) {
 //    return $request->user();
 //});
+Route::group([
+    'namespace' => 'Api'
 
+], function() {
+    // add OPTIONS route to fire cors middleware for preflight
+    Route::options('{any}');
+});
 Route::get('/school', 'apiSchoolController@index');
 Route::get('/school/{id}', 'apiSchoolController@show');
 Route::get('/school/{id}/faculty', 'apiSchoolController@faculty');

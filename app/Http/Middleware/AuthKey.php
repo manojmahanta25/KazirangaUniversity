@@ -19,6 +19,18 @@ class AuthKey
 //        if(trim($token) != 'ABCD'){
 //            return abort(401);
 //        }
-        return $next($request);
+        $headers = [
+            'Access-Control-Allow-Origin' => "*",
+            'Access-Control-Allow-Methods' => "POST,GET,OPTIONS,PUT,DELETE",
+            'Access-Control-Allow-Headers' => "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+        ];
+        if ($request->getMethod() == "OPTIONS"){
+            //The client-side application can set only headers allowed in Access-Control-Allow-Headers
+            return response()->json('OK',200,$headers);
+        }
+        return $next($request)
+            ->header('Access-Control-Allow-Origin', "*")
+            ->header('Access-Control-Allow-Methods', "PUT,POST,DELETE,GET,OPTIONS")
+            ->header('Access-Control-Allow-Headers',"Origin, X-Requested-With, Content-Type, Accept, Authorization");
     }
 }
