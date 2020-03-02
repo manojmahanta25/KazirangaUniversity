@@ -31,4 +31,9 @@ class School extends Model
     public function dean() {
         return $this->hasOne(Dean::class,'school','school_code')->with('deanInfo');
     }
+    public function collaboration(){
+        return $this->belongsToMany(Collaboration::class,'collaboration_school','school_id',
+            'collaboration_id','school_code','id'
+        );
+    }
 }

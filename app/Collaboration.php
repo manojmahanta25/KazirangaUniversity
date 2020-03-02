@@ -12,6 +12,12 @@ class Collaboration extends Model
     protected $fillable =[
         'name','type','description','image_link','web_link','priority'
     ];
+    protected $hidden =[
+        'id',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
 
     public function school()
     {

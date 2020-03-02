@@ -48,7 +48,7 @@ class apiSchoolController extends Controller
      */
     public function show($id)
     {
-        $school = School::where('school_code',$id)->with('dean')->firstOrFail();
+        $school = School::where('school_code',$id)->with('dean')->with('collaboration')->firstOrFail();
         return new SchoolResource($school);
     }
     public function faculty($id)
