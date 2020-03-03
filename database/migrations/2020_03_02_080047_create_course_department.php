@@ -15,7 +15,7 @@ class CreateCourseDepartment extends Migration
     {
         Schema::create('course_department', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('course_id');
+            $table->string('course_id',20);
             $table->string('department_id',20);
             $table->foreign('course_id')->references('course_code')->on('courses')->onDelete('cascade');
             $table->foreign('department_id')->references('depart_code')->on('departments')->onDelete('cascade');

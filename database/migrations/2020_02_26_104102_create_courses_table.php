@@ -22,11 +22,16 @@ class CreateCoursesTable extends Migration
             $table->string('skill_level');
             $table->string('language');
             $table->string('batch_size');
+            $table->string('internship');
+            $table->string('duration');
             $table->string('projects');
             $table->string('mode');
+            $table->string('description')->nullable();
+            $table->string('eligibility')->nullable();
             $table->string('syllabus')->nullable();
             $table->string('meta_tag')->nullable();
             $table->string('meta_des')->nullable();
+            $table->string('image')->nullable();
             $table->bigInteger('fee_inr')->default(0);
             $table->bigInteger('fee_usd')->default(0);
             $table->softDeletes();

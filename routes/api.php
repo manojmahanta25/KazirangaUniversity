@@ -26,6 +26,9 @@ Route::group([
 Route::get('/school', 'apiSchoolController@index');
 Route::get('/school/{id}', 'apiSchoolController@show');
 Route::get('/school/{id}/faculty', 'apiSchoolController@faculty');
+Route::get('/school/{id}/course', 'apiSchoolController@course');
 Route::get('/faculty', 'apiFacultyController@index');
 Route::get('/faculty/{id}', 'apiFacultyController@show');
+Route::get('/course', 'apiCourseController@index');
+Route::get('/course/{id}', 'apiCourseController@show');
 

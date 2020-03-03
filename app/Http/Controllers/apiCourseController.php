@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\School;
-use App\Http\Resources\School as SchoolResource;
+use App\Course;
+use App\Http\Resources\CourseResource;
 use Illuminate\Http\Request;
 
-class apiSchoolController extends Controller
+class apiCourseController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,8 +15,8 @@ class apiSchoolController extends Controller
      */
     public function index()
     {
-        $school = School::all();
-        return SchoolResource::collection($school);
+        $course= Course::select('course_code','course_name','type','image')->with('school')->with('department')->paginate(15);
+        return CourseResource::collection($course);
     }
 
     /**
@@ -37,7 +37,7 @@ class apiSchoolController extends Controller
      */
     public function store(Request $request)
     {
-
+        //
     }
 
     /**
@@ -48,19 +48,10 @@ class apiSchoolController extends Controller
      */
     public function show($id)
     {
-        $school = School::where('school_code',$id)->with('dean')->with('collaboration')->firstOrFail();
-        return new SchoolResource($school);
+        $course= Course::where('course_code',$id)->with('school')->with('department')->firstOrFail();
+        return new CourseResource($course);
     }
-    public function faculty($id)
-    {
-        $school = School::where('school_code',$id)->with('faculty')->firstOrFail();
-        return new SchoolResource($school);
-    }
-    public function course($id)
-    {
-        $school = School::where('school_code',$id)->with('course')->firstOrFail();
-        return new SchoolResource($school);
-    }
+
     /**
      * Show the form for editing the specified resource.
      *

@@ -62,6 +62,14 @@ Route::prefix('admin')->group(function () {
         Route::put('/collaboration/priority/set', ['as'=>'admin.prioritysetCl','uses'=>'CollaborationController@updatePriority']);
         Route::delete('/collaboration/{cid}/delete', ['as'=>'admin.deleteCl','uses'=>'CollaborationController@destroy']);
         Route::put('/collaboration/{cid}/restore', ['as'=>'admin.restoreCl','uses'=>'CollaborationController@restore']);
+
+        Route::get('/course', ['as'=>'admin.Course','uses'=>'CourseController@index']);
+        Route::get('/course/create', ['as'=>'admin.addCourse','uses'=>'CourseController@create']);
+        Route::post('/course/create', ['as'=>'admin.addCoursedb','uses'=>'CourseController@store']);
+        Route::get('/course/{cid}/edit', ['as'=>'admin.editCourse','uses'=>'CourseController@edit']);
+        Route::post('/course/{cid}/edit', ['as'=>'admin.editCoursedb','uses'=>'CourseController@update']);
+        Route::delete('/course/{cid}/delete', ['as'=>'admin.deleteCourse','uses'=>'CourseController@destroy']);
+        Route::put('/course/{cid}/restore', ['as'=>'admin.restoreCourse','uses'=>'CourseController@restore']);
     });
 });
 
