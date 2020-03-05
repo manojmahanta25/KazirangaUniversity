@@ -104,14 +104,14 @@
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" for="description">Description</label>
                         <div class="col-sm-10">
-                            <textarea name="description" id="description" class="form-control summernote" rows="9">{{$cid->description}}</textarea>
+                            <textarea name="description" id="description" class="form-control summernote" rows="9">{{$cid->description ?? ''}}</textarea>
                         </div>
 
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" for="eligibility">Eligibility</label>
                         <div class="col-sm-10">
-                            <textarea name="eligibility" id="eligibility" class="form-control summernote" rows="9">{{$cid->eligibility}}</textarea>
+                            <textarea name="eligibility" id="eligibility" class="form-control summernote" rows="9">{{$cid->eligibility ?? ''}}</textarea>
                         </div>
 
                     </div>
@@ -129,15 +129,16 @@
                     <div class="col-sm-2">
                         <button type="submit" class="btn btn-success waves-effect waves-light m-l-10"  name="sbtnfac">Submit</button>
                     </div>
+                    {!! Form::close() !!}
                 </div>
 
-                {!! Form::close() !!}
+
             </div>
             <!-- card-body -->
         </div>
         <!-- card -->
     </div>
     <!-- col -->
-    </div>
+
     <!-- End row -->
 @endsection

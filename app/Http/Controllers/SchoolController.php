@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Department;
 use App\Designation;
 use App\Faculty;
+use App\Notifications\UserNotification;
 use App\School;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SchoolController extends Controller
@@ -56,6 +59,8 @@ class SchoolController extends Controller
     {
         $schoollist = School::all();
         $datare=1;
+
+
         return view('adpanel.addSchool',compact('datare','schoollist'));
     }
 
@@ -119,6 +124,12 @@ class SchoolController extends Controller
             'smeta_key'=>$request->smeta_key,
             'sdes_key'=>$request->sdes_key,
         ]);
+        $data=[
+            'message'=>'School update',
+            'task'=>$request->school_name.' Changes made'
+        ];
+        $user = Auth::user();
+        User::find(1)->notify(new UserNotification($user,$data));
         session()->flash('success', 'Updated Successfully');
 
         return redirect(route('admin.School'));

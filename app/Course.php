@@ -52,9 +52,9 @@ class Course extends Model
         );
     }
     public function getImageAttribute($value) {
-        return url($value);
+        return ($value)? url($value): null;
     }
     public function getSyllabusAttribute($value) {
-        return url($value);
+        return ($value)? url($value): null;
     }
 }

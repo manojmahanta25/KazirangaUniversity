@@ -70,6 +70,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/course/{cid}/edit', ['as'=>'admin.editCoursedb','uses'=>'CourseController@update']);
         Route::delete('/course/{cid}/delete', ['as'=>'admin.deleteCourse','uses'=>'CourseController@destroy']);
         Route::put('/course/{cid}/restore', ['as'=>'admin.restoreCourse','uses'=>'CourseController@restore']);
+
+        Route::get('/notification/readall', ['as'=>'admin.notificationReadAll','uses'=>'NotificationController@readAll']);
+        Route::get('/notification/{id}/read', ['as'=>'admin.notificationRead','uses'=>'NotificationController@read']);
+
     });
 });
 

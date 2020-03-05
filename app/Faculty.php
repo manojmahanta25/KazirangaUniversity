@@ -55,7 +55,7 @@ class Faculty extends Model
         return $this->hasOne(FacultyDetails::class,'faculty_id','faculty_id');
     }
     public function getImageAttribute($value) {
-        return url($value);
+        return ($value)? url($value): null;
     }
 
 }

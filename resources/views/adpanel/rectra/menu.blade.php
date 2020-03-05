@@ -22,35 +22,29 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-right float-right list-inline">
-                    <li class="dropdown d-none d-sm-block"><a href="#" data-target="#" class="dropdown-toggle waves-effect waves-light notification-icon-box" data-toggle="dropdown" aria-expanded="true"><i class="fa fa-bell"></i> <span class="badge badge-xs badge-danger"></span></a>
+                    <li class="dropdown d-none d-sm-block"><a href="#" data-target="#" class="dropdown-toggle waves-effect waves-light notification-icon-box" data-toggle="dropdown" aria-expanded="true"><i class="fa fa-bell"></i> @if(auth()->user()->unreadNotifications->count()>0)<span class="badge badge-xs badge-danger"></span>@endif</a>
                         <ul class="dropdown-menu dropdown-menu-lg">
-                            <li class="text-center notifi-title">Notification <span class="badge badge-xs badge-success">3</span></li>
+                            <li class="text-center notifi-title">Notification <span class="badge badge-xs badge-success">{{auth()->user()->unreadNotifications->count()}}</span></li>
                             <li class="list-group">
+                                @forelse(auth()->user()->unreadNotifications->take(3) as $row)
                                 <!-- list item-->
-                                <a href="javascript:void(0);" class="list-group-item">
+                                <a href="{{route('admin.notificationRead',$row->id)}}" class="list-group-item">
                                     <div class="media">
-                                        <div class="media-heading">Your order is placed</div>
-                                        <p class="m-0"><small>Dummy text of the printing and typesetting industry.</small></p>
+                                        <div class="media-heading text-info">{{$row->data['data']}} By <b>{{$row->data['user']}}</b></div>
+                                        <p class="m-0"><small>{{$row->data['task']}} </small></p>
+                                        <p class="m-0"><small><b>{{(date('d-m-Y',strtotime($row->created_at))==date('d-m-Y',strtotime(\Carbon\Carbon::today()))) ? 'Today': $row->created_at->format('d M') }} </b> </small></p>
                                     </div>
                                 </a>
+                                @empty
+                                        <a href="javascript:void(0);" class="list-group-item">
+                                            <div class="media">
+                                                <div class="media-heading">You got no New Notification</div>
+                                                <p class="m-0"><small>^ ^</small></p>
+                                            </div>
+                                        </a>
+                                @endforelse
                                 <!-- list item-->
-                                <a href="javascript:void(0);" class="list-group-item">
-                                    <div class="media">
-                                        <div class="media-body clearfix">
-                                            <div class="media-heading">New Message received</div>
-                                            <p class="m-0"><small>You have 87 unread messages</small></p>
-                                        </div>
-                                    </div>
-                                </a>
-                                <!-- list item-->
-                                <a href="javascript:void(0);" class="list-group-item">
-                                    <div class="media">
-                                        <div class="media-body clearfix">
-                                            <div class="media-heading">Your item is shipped.</div>
-                                            <p class="m-0"><small>It is a long established fact that a reader will</small></p>
-                                        </div>
-                                    </div>
-                                </a>
+
                                 <!-- last list item --><a href="javascript:void(0);" class="list-group-item"><small class="text-primary">See all notifications</small></a></li>
 
                         </ul>

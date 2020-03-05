@@ -26,8 +26,8 @@ class CreateCoursesTable extends Migration
             $table->string('duration');
             $table->string('projects');
             $table->string('mode');
-            $table->string('description')->nullable();
-            $table->string('eligibility')->nullable();
+            $table->text('description')->nullable();
+            $table->text('eligibility')->nullable();
             $table->string('syllabus')->nullable();
             $table->string('meta_tag')->nullable();
             $table->string('meta_des')->nullable();
