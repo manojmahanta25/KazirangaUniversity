@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Department;
 use App\Designation;
+use App\Notifications\UserNotification;
 use App\School;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class DepartmentController extends Controller
 {
@@ -14,6 +17,16 @@ class DepartmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    private $_user;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->_user=Auth::user(); // returns user
+            return $next($request);
+        });
+
+    }
     public function index()
     {
         $deptlist = Department::all();
@@ -28,22 +41,7 @@ class DepartmentController extends Controller
         }
         return $subevent;
     }
-    public function deptFetch() {
-        $comp=  Department::all()->toArray();
-        $subevent = [];
-        foreach ($comp as $elements){
-            $subevent[$elements['school']][$elements['depart_code']] = $elements['depart_name'];
-        }
-        return $subevent;
-    }
-    public function designationFetch() {
-        $comp=  Designation::all()->toArray();
-        $subevent = [];
-        foreach ($comp as $elements){
-            $subevent[$elements['id']] = $elements['name'];
-        }
-        return $subevent;
-    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -69,6 +67,13 @@ class DepartmentController extends Controller
             'depart_name'=>ucwords($request->depart_name),
             'school'=>$request->school,
         ]);
+
+        $data=[
+            'message'=>'Department Created',
+            'task'=>'Where name: '.$request->depart_name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Created Successfully');
 
         return redirect(route('admin.Dept'));
@@ -93,6 +98,7 @@ class DepartmentController extends Controller
      */
     public function edit(Department $did)
     {
+
         $schoollist = $this->schoolFetch();
         $datare=1;
         return view('adpanel.editDepartment',compact('datare','schoollist','did'));
@@ -111,6 +117,13 @@ class DepartmentController extends Controller
             'depart_name'=>$request->depart_name,
             'school'=>$request->school,
             ]);
+
+        $data=[
+            'message'=>'Department Update',
+            'task'=>'Where name: '.$request->depart_name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Updated Successfully');
 
         return redirect(route('admin.Dept'));
@@ -126,8 +139,17 @@ class DepartmentController extends Controller
     {
         $did->delete();
 
+        $data=[
+            'message'=>'Department Deleted',
+            'task'=>'Where name: '.$did->depart_name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Deleted Successfully');
 
         return redirect(route('admin.Dept'));
+    }
+    public function sentNotification($data){
+        User::find(1)->notify(new UserNotification($this->_user,$data));
     }
 }

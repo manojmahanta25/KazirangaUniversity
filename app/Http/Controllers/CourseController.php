@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use App\Course;
 use App\Department;
+use App\Notifications\UserNotification;
 use App\School;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
+use App\User;
 
 class CourseController extends Controller
 {
@@ -15,6 +17,15 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    private $_user;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->_user=Auth::user(); // returns user
+            return $next($request);
+        });
+    }
     public function index()
     {
         $facdet= Course::all();
@@ -143,6 +154,13 @@ class CourseController extends Controller
             $path = $request->file('weblink')->storeAs('public/courses/syllabus',$fileNameToStore);
             $course->update(['syllabus'=>'storage/courses/syllabus'.$fileNameToStore]);
         }
+
+        $data=[
+            'message'=>'Course Created',
+            'task'=>'With ID'.$request->code
+        ];
+        $this->sentNotification($data);
+
         return redirect(route('admin.Course'))->with('success', 'Successfully Created!!');
         //image clfile //weblink sylabus
     }
@@ -257,6 +275,11 @@ class CourseController extends Controller
             $path = $request->file('weblink')->storeAs('public/courses/syllabus',$fileNameToStore);
 
         }
+        $data=[
+            'message'=>'Course Update',
+            'task'=>'Where ID: '.$cid->course_code
+        ];
+        $this->sentNotification($data);
         return redirect(route('admin.Course'))->with('success', 'Successfully Created!!');
     }
 
@@ -271,15 +294,28 @@ class CourseController extends Controller
         $cid->delete();
 
         session()->flash('success', 'Deleted Successfully');
+        $data=[
+            'message'=>'Course Deleted',
+            'task'=>'Where ID: '.$cid->course_code
+        ];
+        $this->sentNotification($data);
 
         return redirect()->back();
     }
     public function restore($cid)
     {
         Course::onlyTrashed()->where('course_code', $cid)->restore();
+        $data=[
+            'message'=>'Course Restored',
+            'task'=>'Where ID: '.$cid->course_code
+        ];
+        $this->sentNotification($data);
 
         session()->flash('success', 'Restore Successfully');
 
         return redirect()->back();
+    }
+    public function sentNotification($data){
+        User::find(1)->notify(new UserNotification($this->_user,$data));
     }
 }

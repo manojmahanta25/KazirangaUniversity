@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Department;
 use App\Designation;
+use App\Notifications\UserNotification;
 use App\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class DesignationController extends Controller
 {
@@ -15,6 +18,15 @@ class DesignationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    private $_user;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->_user=Auth::user(); // returns user
+            return $next($request);
+        });
+    }
     public function index()
     {
         $desglist = Designation::all();
@@ -71,6 +83,13 @@ class DesignationController extends Controller
             'd_visible'=>($request->visible)? true: false,
             'd_priority'=>++$priority
         ]);
+
+        $data=[
+            'message'=>'Designation Store',
+            'task'=>'Where name: '.$request->name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Created Successfully');
 
         return redirect(route('admin.Desig'));
@@ -111,6 +130,13 @@ class DesignationController extends Controller
             'name'=>ucwords($request->name),
             'd_visible'=>($request->visible)? true: false,
         ]);
+
+        $data=[
+            'message'=>'Designation Update',
+            'task'=>'Where name: '.$des->name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Updated Successfully');
 
         return redirect(route('admin.Desig'));
@@ -137,6 +163,13 @@ class DesignationController extends Controller
                end', [$main->d_priority, $second->d_priority,$main->d_priority,$second->d_priority]);
 
         }
+
+        $data=[
+            'message'=>'Designation Update',
+            'task'=>$main.' with '.$second
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Priority Updated Successfully');
 
         return redirect(route('admin.Desig'));
@@ -155,8 +188,18 @@ class DesignationController extends Controller
     {
         $des->delete();
 
+        $data=[
+            'message'=>'Designation Deleted',
+            'task'=>'Where name: '.$des->name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Deleted Successfully');
 
         return redirect(route('admin.Desig'));
     }
+    public function sentNotification($data){
+        User::find(1)->notify(new UserNotification($this->_user,$data));
+    }
+
 }

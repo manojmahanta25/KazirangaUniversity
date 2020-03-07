@@ -15,7 +15,7 @@ class apiSchoolController extends Controller
      */
     public function index()
     {
-        $school = School::all();
+        $school = School::with('departments')->get();
         return SchoolResource::collection($school);
     }
 

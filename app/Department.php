@@ -26,6 +26,6 @@ class Department extends Model
             ,'faculty_id','depart_code','faculty_id')->with('designations');
     }
     public function schoolInfo(){
-        return $this->belongsTo(School::class,'school','school_code');
+        return $this->belongsTo(School::class,'school_code','school');
     }
 }

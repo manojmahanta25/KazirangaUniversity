@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Collaboration;
 use App\Department;
+use App\Notifications\UserNotification;
 use App\School;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use DB;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class CollaborationController extends Controller
 {
@@ -16,6 +19,15 @@ class CollaborationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    private $_user;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->_user=Auth::user(); // returns user
+            return $next($request);
+        });
+    }
     public function index()
     {
         $collaborations=Collaboration::all();
@@ -98,6 +110,13 @@ class CollaborationController extends Controller
         {
             $collaboration->department()->attach($request->dept);
         }
+
+        $data=[
+            'message'=>'Collaboration Created',
+            'task'=>'With Name: '.$request->name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Created Successfully');
 
         return redirect(route('admin.Cl'));
@@ -171,6 +190,13 @@ class CollaborationController extends Controller
         {
             $collaboration->department()->sync($request->dept);
         }
+
+        $data=[
+            'message'=>'Collaboration Updated',
+            'task'=>'Where ID: '.$collaboration->name
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Updated Successfully');
 
         return redirect(route('admin.Cl'));
@@ -193,15 +219,20 @@ class CollaborationController extends Controller
         {
             DB::update(' update collaborations
          set priority = case when priority = ? then ?
-                    when priority>= ? and priority <= ? then priority - 1 
+                    when priority>= ? and priority <= ? then priority - 1
                     else priority
                end', [$main->priority, $second->priority,$main->priority,$second->priority,]);
         }
+
+        $data=[
+            'message'=>'Collaboration Priority updated',
+            'task'=>$request->cid.'with'.$request->cidafter
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Priority Updated Successfully');
 
         return redirect(route('admin.Cl'));
-
-
     }
 
     /**
@@ -215,6 +246,11 @@ class CollaborationController extends Controller
         $cid->delete();
 
         session()->flash('success', 'Deleted Successfully');
+        $data=[
+            'message'=>'Collaboration Deleted',
+            'task'=>'Where name: '.$cid->name
+        ];
+        $this->sentNotification($data);
 
         return redirect()->back();
     }
@@ -223,7 +259,16 @@ class CollaborationController extends Controller
         Collaboration::onlyTrashed()->where('id', $cid)->restore();
 
         session()->flash('success', 'Restore Successfully');
+        $data=[
+            'message'=>'Collaboration Restore',
+            'task'=>'Where name: '.$cid->name
+        ];
+        $this->sentNotification($data);
 
         return redirect()->back();
+    }
+
+    public function sentNotification($data){
+        User::find(1)->notify(new UserNotification($this->_user,$data));
     }
 }

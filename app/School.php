@@ -36,6 +36,9 @@ class School extends Model
             'collaboration_id','school_code','id'
         );
     }
+    public  function departments() {
+        return $this->hasMany(Department::class, 'school','school_code');
+    }
     public function course(){
         return $this->belongsToMany(Course::class,'course_school','school_id',
             'course_id','school_code','course_code'

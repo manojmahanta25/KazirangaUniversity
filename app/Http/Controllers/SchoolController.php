@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+
 class SchoolController extends Controller
 {
     /**
@@ -19,6 +20,17 @@ class SchoolController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    private $_user;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->_user=Auth::user(); // returns user
+            return $next($request);
+        });
+    }
+
     public function index()
     {
         $schoollist = School::all();
@@ -80,6 +92,11 @@ class SchoolController extends Controller
             'sdes_key'=>$request->sdes_key,
             's_order'=>++$priority
         ]);
+        $data=[
+            'message'=>'School Created',
+            'task'=>'With ID'.$request->school_code
+        ];
+        $this->sentNotification($data);
         session()->flash('success', 'Created Successfully');
 
         return redirect(route('admin.School'));
@@ -128,8 +145,8 @@ class SchoolController extends Controller
             'message'=>'School update',
             'task'=>$request->school_name.' Changes made'
         ];
-        $user = Auth::user();
-        User::find(1)->notify(new UserNotification($user,$data));
+        $this->sentNotification($data);
+
         session()->flash('success', 'Updated Successfully');
 
         return redirect(route('admin.School'));
@@ -156,6 +173,11 @@ class SchoolController extends Controller
                end', [$main->s_order, $second->s_order,$main->s_order,$second->s_order]);
 
         }
+        $data=[
+            'message'=>'School priority update',
+            'task'=>$request->schoolid.' with '.$request->schoolidafter
+        ];
+        $this->sentNotification($data);
         session()->flash('success', 'Priority Updated Successfully');
 
         return redirect(route('admin.School'));
@@ -171,9 +193,17 @@ class SchoolController extends Controller
     public function destroy(School $sid)
     {
         $sid->delete();
+        $data=[
+            'message'=>'School Deleted',
+            'task'=>$sid->school_code.' Deleted'
+        ];
+        $this->sentNotification($data);
 
         session()->flash('success', 'Deleted Successfully');
 
         return redirect(route('admin.School'));
+    }
+    public function sentNotification($data){
+        User::find(1)->notify(new UserNotification($this->_user,$data));
     }
 }

@@ -8,9 +8,13 @@ use App\Designation;
 use App\Faculty;
 use App\FacultyDetails;
 use App\Hod;
+use App\Notifications\UserNotification;
 use App\School;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
+use App\User;
 
 class FacultyController extends Controller
 {
@@ -19,6 +23,17 @@ class FacultyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    private $_user;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->_user=Auth::user(); // returns user
+            return $next($request);
+        });
+
+    }
     public function index()
     {
         $facdet= Faculty::all();
@@ -114,6 +129,13 @@ class FacultyController extends Controller
         if($request->designation) {
             $faculty->designations()->attach($request->designation);
         }
+
+        $data=[
+            'message'=>'Faculty Created',
+            'task'=>'Where ID: '.$request->facid
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Created Successfully');
 
         return redirect(route('admin.addFaculty'));
@@ -181,6 +203,13 @@ class FacultyController extends Controller
                 'publications' => ($request->publications==""|| $request->publications==NULL)? NULL: $request->publications
                 ]
         );
+
+        $data=[
+            'message'=>'Faculty Update',
+            'task'=>'Where ID: '.$id
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Updated Successfully');
 
         return redirect(route('admin.Faculty'));
@@ -207,6 +236,12 @@ class FacultyController extends Controller
                     else priority
                end', [$main->priority, $second->priority,$main->priority,$second->priority,]);
         }
+
+        $data=[
+            'message'=>'Faculty Priority Update',
+            'task'=>$main.' with '.$second
+        ];
+        $this->sentNotification($data);
         session()->flash('success', 'Priority Updated Successfully');
 
         return redirect(route('admin.priorityFaculty'));
@@ -223,6 +258,12 @@ class FacultyController extends Controller
     {
         $fid->delete();
 
+        $data=[
+            'message'=>'Faculty Delete',
+            'task'=>'Where ID: '.$fid->faculty_id
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Deleted Successfully');
 
         return redirect()->back();
@@ -231,8 +272,17 @@ class FacultyController extends Controller
     {
         Faculty::onlyTrashed()->where('faculty_id', $fid)->restore();
 
+        $data=[
+            'message'=>'Faculty Restored',
+            'task'=>'Where ID: '.$fid
+        ];
+        $this->sentNotification($data);
+
         session()->flash('success', 'Restore Successfully');
 
         return redirect()->back();
+    }
+    public function sentNotification($data){
+        User::find(1)->notify(new UserNotification($this->_user,$data));
     }
 }
